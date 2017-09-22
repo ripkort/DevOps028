@@ -31,14 +31,17 @@ sudo pip3 install boto3 awscli
 mkdir ~/.aws
 cp /vagrant/credentials ~/.aws/
 
-#DB_INSTANCE=`aws rds describe-db-instances --region $RDS_REGION --query 'DBInstances[*].[DBInstanceIdentifier,Endpoint.Address,Endpoint.Port]' --output text | grep ${DB_INS_ID}`
-#if [[ -n DB_INSTANCE ]]; then
-#	aws rds delete-db-instance --db-instance-identifier ${DB_INS_ID} --region $RDS_REGION --skip-final-snapshot
-#	aws rds wait db-instance-deleted --db-instance-identifier ${DB_INS_ID} --region $RDS_REGION
-#fi
+if [[ -e /vagrant/recreate ]]; then
+	DB_INSTANCE=`aws rds describe-db-instances --region $RDS_REGION --query 'DBInstances[*].[DBInstanceIdentifier,Endpoint.Address,Endpoint.Port]' --output text | grep ${DB_INS_ID}`
+        if [[ -n DB_INSTANCE ]]; then
+	        aws rds delete-db-instance --db-instance-identifier ${DB_INS_ID} --region $RDS_REGION --skip-final-snapshot
+	        aws rds wait db-instance-deleted --db-instance-identifier ${DB_INS_ID} --region $RDS_REGION
+        fi
 
-#aws rds create-db-instance --db-instance-identifier ${DB_INS_ID} --db-instance-class db.t2.micro --engine postgres --backup-retention-period 0 --storage-type standard --allocated-storage 5 --region ${RDS_REGION} --db-name ${DB_NAME} --master-username ${DB_USER} --master-user-password ${DB_PASS}
-#aws rds wait db-instance-available --db-instance-identifier ${DB_INS_ID}  --region ${RDS_REGION}
+        aws rds create-db-instance --db-instance-identifier ${DB_INS_ID} --db-instance-class db.t2.micro --engine postgres --backup-retention-period 0 --storage-type standard --allocated-storage 5 --region ${RDS_REGION} --db-name ${DB_NAME} --master-username ${DB_USER} --master-user-password ${DB_PASS}
+        aws rds wait db-instance-available --db-instance-identifier ${DB_INS_ID}  --region ${RDS_REGION}
+
+fi
 
 DB_INSTANCE=`aws rds describe-db-instances --region $RDS_REGION --query 'DBInstances[*].[DBInstanceIdentifier,Endpoint.Address,Endpoint.Port]' --output text | grep ${DB_INS_ID}`
 
